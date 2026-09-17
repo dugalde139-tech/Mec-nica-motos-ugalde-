@@ -1,1 +1,202 @@
-archivo temporal 
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Mecánica de Motos Ugalde</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#f3f4f6;color:#111827}
+header{background:#111827;color:#fff;padding:18px 16px;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px #0002}
+header h1{margin:0;font-size:21px}header small{opacity:.75}
+nav{display:flex;gap:7px;overflow:auto;padding:10px;background:#fff;position:sticky;top:76px;z-index:4;border-bottom:1px solid #ddd}
+nav button{white-space:nowrap;border:0;border-radius:9px;padding:9px 12px;background:#e5e7eb;font-weight:700}
+nav button.active{background:#111827;color:#fff}
+main{max-width:1100px;margin:auto;padding:16px}.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 5px #0001}.num{font-size:27px;font-weight:800;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.full{grid-column:1/-1}
+label{font-size:13px;font-weight:700;display:block;margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;background:#fff}textarea{min-height:85px;resize:vertical}
+button{cursor:pointer}.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;background:#111827;color:#fff}.btn.secondary{background:#e5e7eb;color:#111827}.btn.green{background:#166534}.btn.red{background:#b91c1c}.btn.blue{background:#1d4ed8}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tablewrap{overflow:auto;background:#fff;border-radius:12px;box-shadow:0 1px 5px #0001}table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px}th{background:#f8fafc}
+.badge{padding:5px 8px;border-radius:99px;font-size:12px;font-weight:800;background:#e5e7eb}.search{margin-bottom:12px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;padding:16px;overflow:auto}.modal.show{display:block}.modalbox{background:#fff;max-width:850px;margin:20px auto;border-radius:16px;padding:18px}
+h2{margin-top:0}.muted{color:#64748b}.danger{color:#b91c1c;font-weight:700}
+@media(max-width:600px){main{padding:10px}.cards{grid-template-columns:repeat(2,1fr)}.card{padding:12px}.num{font-size:22px}}
+@media print{header,nav,.no-print{display:none!important}body{background:#fff}.modal{position:static;background:#fff;padding:0}.modalbox{box-shadow:none;max-width:none;margin:0}}
+</style>
+<style>
+.photo-preview{max-width:140px;max-height:140px;border-radius:12px;object-fit:cover;border:1px solid #cbd5e1;margin-top:8px}
+.statbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.mini{font-size:12px;padding:6px 9px}
+</style></head>
+<body>
+<header><h1>🔧 Mecánica de Motos Ugalde</h1><small>Gestión de taller · versión PRO · funciona sin internet</small></header>
+<nav id="nav">
+<button data-page="inicio" class="active">Inicio</button><button data-page="ordenes">Órdenes</button><button data-page="clientes">Clientes</button><button data-page="motos">Motos</button><button data-page="inventario">Inventario</button><button data-page="caja">Caja</button><button data-page="datos">Datos</button>
+</nav>
+<main>
+<section id="inicio" class="page active">
+<h2>Panel del taller</h2>
+<div class="cards">
+<div class="card">Órdenes abiertas<div class="num" id="kOpen">0</div></div>
+<div class="card">Órdenes entregadas<div class="num" id="kDone">0</div></div>
+<div class="card">Clientes<div class="num" id="kClients">0</div></div>
+<div class="card">Motos<div class="num" id="kBikes">0</div></div>
+<div class="card">Ventas registradas<div class="num" id="kSales">$0</div></div>
+<div class="card">Inventario bajo<div class="num" id="kLow">0</div></div>
+</div>
+<div class="actions"><button class="btn" onclick="newOrder()">➕ Nueva orden</button><button class="btn blue" onclick="showPage('clientes');openClient()">👤 Nuevo cliente</button><button class="btn green" onclick="showPage('caja');openCash('ingreso')">💵 Cobrar</button></div><div class="statbar"><div class="card">Pendiente por cobrar<div class="num" id="kDebt">$0</div></div><div class="card">Servicios registrados<div class="num" id="kMonth">$0</div></div></div>
+<div class="card"><h3>Resumen rápido</h3><div id="quickSummary" class="muted">Sin datos todavía.</div></div><div class="card"><h3>Información del taller</h3><p><b>Mecánica de Motos Ugalde</b><br>Trabajos de mecánica de motos<br>Trabajos a domicilio<br>WhatsApp: 5619449163<br>Teléfono fijo: 5661291981<br>Calle Navidad número 25</p></div>
+</section>
+
+<section id="ordenes" class="page">
+<h2>Órdenes de servicio</h2>
+<div class="actions"><button class="btn" onclick="newOrder()">➕ Nueva orden</button></div>
+<input class="search" id="orderSearch" placeholder="Buscar por número, cliente, teléfono, moto..." oninput="renderOrders()">
+<div class="tablewrap"><table><thead><tr><th>Orden</th><th>Cliente</th><th>Moto</th><th>Estado</th><th>Total</th><th>Saldo</th><th></th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+</section>
+
+<section id="clientes" class="page">
+<h2>Clientes</h2><div class="actions"><button class="btn" onclick="openClient()">➕ Nuevo cliente</button></div>
+<input class="search" id="clientSearch" placeholder="Buscar cliente..." oninput="renderClients()">
+<div class="tablewrap"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Motos</th><th></th></tr></thead><tbody id="clientsBody"></tbody></table></div>
+</section>
+
+<section id="motos" class="page">
+<h2>Motocicletas</h2><div class="actions"><button class="btn" onclick="openBike()">➕ Nueva moto</button></div>
+<input class="search" id="bikeSearch" placeholder="Buscar moto, cliente, placas..." oninput="renderBikes()">
+<div class="tablewrap"><table><thead><tr><th>Cliente</th><th>Marca / modelo</th><th>Año</th><th>Placas</th><th>Km</th><th></th></tr></thead><tbody id="bikesBody"></tbody></table></div>
+</section>
+
+<section id="inventario" class="page">
+<h2>Inventario</h2><div class="actions"><button class="btn" onclick="openPart()">➕ Nueva refacción</button></div>
+<input class="search" id="partSearch" placeholder="Buscar refacción..." oninput="renderParts()">
+<div class="tablewrap"><table><thead><tr><th>Refacción</th><th>Código</th><th>Existencia</th><th>Mínimo</th><th>Compra</th><th>Venta</th><th></th></tr></thead><tbody id="partsBody"></tbody></table></div>
+</section>
+
+<section id="caja" class="page">
+<h2>Caja</h2>
+<div class="cards"><div class="card">Ingresos<div class="num" id="cashIn">$0</div></div><div class="card">Gastos<div class="num" id="cashOut">$0</div></div><div class="card">Balance<div class="num" id="cashBal">$0</div></div></div>
+<div class="actions"><button class="btn green" onclick="openCash('ingreso')">➕ Registrar ingreso</button><button class="btn red" onclick="openCash('gasto')">➖ Registrar gasto</button></div>
+<div class="tablewrap"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th></th></tr></thead><tbody id="cashBody"></tbody></table></div>
+</section>
+
+<section id="datos" class="page">
+<h2>Datos y respaldo</h2>
+<div class="card">
+<p>Los datos se guardan en este dispositivo. Haz respaldos periódicos para no perderlos.</p>
+<div class="actions"><button class="btn blue" onclick="exportData()">⬇️ Exportar respaldo</button><button class="btn secondary" onclick="document.getElementById('importFile').click()">⬆️ Importar respaldo</button><input id="importFile" type="file" accept=".json" hidden onchange="importData(event)"></div>
+<button class="btn red" onclick="clearAll()">Borrar todos los datos</button>
+</div>
+</section>
+</main>
+
+<div class="modal" id="modal"><div class="modalbox" id="modalbox"></div></div>
+<script>
+const KEY='ugalde_taller_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{clients:[],bikes:[],orders:[],parts:[],cash:[],seq:1};
+function save(){localStorage.setItem(KEY,JSON.stringify(db));refresh();}
+const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(n)||0);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function showPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(p).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));refresh();}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function refresh(){renderOrders();renderClients();renderBikes();renderParts();renderCash();dashboard();}
+function dashboard(){
+let open=db.orders.filter(o=>o.status!=='Entregada').length, done=db.orders.filter(o=>o.status==='Entregada').length;
+document.getElementById('kOpen').textContent=open;document.getElementById('kDone').textContent=done;document.getElementById('kClients').textContent=db.clients.length;document.getElementById('kBikes').textContent=db.bikes.length;
+document.getElementById('kSales').textContent=money(db.cash.filter(x=>x.type==='ingreso').reduce((a,x)=>a+Number(x.amount),0));
+document.getElementById('kLow').textContent=db.parts.filter(p=>Number(p.stock)<=Number(p.min)).length;
+let debt=db.orders.reduce((a,o)=>a+Math.max(0,Number(o.total)-Number(o.advance)),0);document.getElementById('kDebt').textContent=money(debt);
+let services=db.orders.reduce((a,o)=>a+Number(o.total||0),0);document.getElementById('kMonth').textContent=money(services);
+let pend=db.orders.filter(o=>o.status!=='Entregada').slice(-5).reverse();document.getElementById('quickSummary').innerHTML=pend.length?pend.map(o=>`<div style="padding:7px 0;border-bottom:1px solid #eee"><b>#${o.num}</b> · ${esc(clientName(o.clientId))} · ${esc(o.status)} · <b>${money(o.total-o.advance)}</b></div>`).join(''):'No hay órdenes pendientes.';
+let ins=db.cash.filter(x=>x.type==='ingreso').reduce((a,x)=>a+Number(x.amount),0),outs=db.cash.filter(x=>x.type==='gasto').reduce((a,x)=>a+Number(x.amount),0);
+document.getElementById('cashIn').textContent=money(ins);document.getElementById('cashOut').textContent=money(outs);document.getElementById('cashBal').textContent=money(ins-outs);
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function modal(html){document.getElementById('modalbox').innerHTML=html;document.getElementById('modal').classList.add('show');if(typeof o!=='undefined'&&o.photo){let pb=document.getElementById('photoBox');if(pb)pb.innerHTML='<img class="photo-preview" src="'+o.photo+'">';}}
+function clientName(id){return db.clients.find(c=>c.id===id)?.name||'Sin cliente'}
+function bikeName(id){let b=db.bikes.find(x=>x.id===id);return b?`${b.brand} ${b.model}`:'Sin moto'}
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+
+function openClient(id=null){
+let c=db.clients.find(x=>x.id===id)||{name:'',phone:'',address:'',notes:''};
+modal(`<h2>${id?'Editar':'Nuevo'} cliente</h2><div class="grid">
+<div><label>Nombre *</label><input id="cName" value="${esc(c.name)}"></div><div><label>Teléfono / WhatsApp</label><input id="cPhone" value="${esc(c.phone)}"></div>
+<div class="full"><label>Dirección</label><input id="cAddress" value="${esc(c.address)}"></div><div class="full"><label>Notas</label><textarea id="cNotes">${esc(c.notes)}</textarea></div></div>
+<div class="actions"><button class="btn" onclick="saveClient('${id||''}')">Guardar</button><button class="btn secondary" onclick="closeModal()">Cancelar</button></div>`);
+}
+function saveClient(id){let c={id:id||newId(),name:document.getElementById('cName').value.trim(),phone:document.getElementById('cPhone').value.trim(),address:document.getElementById('cAddress').value.trim(),notes:document.getElementById('cNotes').value.trim()};if(!c.name)return alert('Escribe el nombre.');let i=db.clients.findIndex(x=>x.id===c.id);if(i>=0)db.clients[i]=c;else db.clients.push(c);closeModal();save()}
+function deleteClient(id){if(confirm('¿Eliminar cliente?')){db.clients=db.clients.filter(x=>x.id!==id);db.bikes=db.bikes.filter(x=>x.clientId!==id);save()}}
+function renderClients(){let q=(document.getElementById('clientSearch')?.value||'').toLowerCase();document.getElementById('clientsBody').innerHTML=db.clients.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q)).map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.phone)}</td><td>${esc(c.address)}</td><td>${db.bikes.filter(b=>b.clientId===c.id).length}</td><td><button class="btn secondary" onclick="openClient('${c.id}')">Editar</button> <button class="btn red" onclick="deleteClient('${c.id}')">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="5">No hay clientes.</td></tr>'}
+
+function openBike(id=null){
+let b=db.bikes.find(x=>x.id===id)||{clientId:'',brand:'',model:'',year:'',cc:'',color:'',plates:'',vin:'',km:'',notes:''};
+modal(`<h2>${id?'Editar':'Nueva'} motocicleta</h2><div class="grid">
+<div><label>Cliente *</label><select id="bClient"><option value="">Seleccionar</option>${db.clients.map(c=>`<option value="${c.id}" ${c.id===b.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+<div><label>Marca</label><input id="bBrand" value="${esc(b.brand)}"></div><div><label>Modelo</label><input id="bModel" value="${esc(b.model)}"></div><div><label>Año</label><input id="bYear" value="${esc(b.year)}"></div><div><label>Cilindrada</label><input id="bCc" value="${esc(b.cc)}"></div><div><label>Color</label><input id="bColor" value="${esc(b.color)}"></div><div><label>Placas</label><input id="bPlates" value="${esc(b.plates)}"></div><div><label>Número de serie/VIN</label><input id="bVin" value="${esc(b.vin)}"></div><div><label>Kilometraje</label><input id="bKm" value="${esc(b.km)}"></div><div class="full"><label>Notas</label><textarea id="bNotes">${esc(b.notes)}</textarea></div></div>
+<div class="actions"><button class="btn" onclick="saveBike('${id||''}')">Guardar</button><button class="btn secondary" onclick="closeModal()">Cancelar</button></div>`);
+}
+function saveBike(id){let b={id:id||newId(),clientId:document.getElementById('bClient').value,brand:document.getElementById('bBrand').value.trim(),model:document.getElementById('bModel').value.trim(),year:document.getElementById('bYear').value.trim(),cc:document.getElementById('bCc').value.trim(),color:document.getElementById('bColor').value.trim(),plates:document.getElementById('bPlates').value.trim(),vin:document.getElementById('bVin').value.trim(),km:document.getElementById('bKm').value.trim(),notes:document.getElementById('bNotes').value.trim()};if(!b.clientId)return alert('Selecciona un cliente.');let i=db.bikes.findIndex(x=>x.id===b.id);if(i>=0)db.bikes[i]=b;else db.bikes.push(b);closeModal();save()}
+function deleteBike(id){if(confirm('¿Eliminar motocicleta?')){db.bikes=db.bikes.filter(x=>x.id!==id);save()}}
+function renderBikes(){let q=(document.getElementById('bikeSearch')?.value||'').toLowerCase();document.getElementById('bikesBody').innerHTML=db.bikes.filter(b=>(clientName(b.clientId)+' '+b.brand+' '+b.model+' '+b.plates).toLowerCase().includes(q)).map(b=>`<tr><td>${esc(clientName(b.clientId))}</td><td><b>${esc(b.brand)} ${esc(b.model)}</b></td><td>${esc(b.year)}</td><td>${esc(b.plates)}</td><td>${esc(b.km)}</td><td><button class="btn secondary" onclick="openBike('${b.id}')">Editar</button> <button class="btn red" onclick="deleteBike('${b.id}')">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="6">No hay motos.</td></tr>'}
+
+function newOrder(){if(!db.clients.length)return alert('Primero registra un cliente.');let today=new Date().toLocaleDateString('es-MX');let o={id:newId(),num:db.seq++,date:today,clientId:db.clients[0].id,bikeId:'',problem:'',diagnosis:'',work:'',partsText:'',labor:0,partsCost:0,total:0,advance:0,status:'Recibida',delivery:'',notes:''};openOrder(o)}
+function openOrder(idOrObj){
+let o=typeof idOrObj==='string'?db.orders.find(x=>x.id===idOrObj):idOrObj;
+let isNew=!db.orders.some(x=>x.id===o.id);
+modal(`<h2>Orden #${o.num}</h2><div class="grid">
+<div><label>Cliente *</label><select id="oClient" onchange="orderBikes()">${db.clients.map(c=>`<option value="${c.id}" ${c.id===o.clientId?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+<div><label>Motocicleta</label><select id="oBike">${db.bikes.filter(b=>b.clientId===o.clientId).map(b=>`<option value="${b.id}" ${b.id===o.bikeId?'selected':''}>${esc(b.brand)} ${esc(b.model)} · ${esc(b.plates)}</option>`).join('')}</select></div>
+<div><label>Estado</label><select id="oStatus">${['Recibida','En diagnóstico','En reparación','Lista','Entregada'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></div>
+<div><label>Fecha de entrega</label><input id="oDelivery" value="${esc(o.delivery)}" placeholder="dd/mm/aaaa"></div>
+<div class="full"><label>Falla reportada</label><textarea id="oProblem">${esc(o.problem)}</textarea></div>
+<div class="full"><label>Diagnóstico</label><textarea id="oDiagnosis">${esc(o.diagnosis)}</textarea></div>
+<div class="full"><label>Trabajo realizado</label><textarea id="oWork">${esc(o.work)}</textarea></div>
+<div class="full"><label>Refacciones utilizadas / detalle</label><textarea id="oPartsText">${esc(o.partsText)}</textarea></div>
+<div><label>Refacciones ($)</label><input type="number" step="0.01" id="oParts" value="${o.partsCost}"></div>
+<div><label>Mano de obra ($)</label><input type="number" step="0.01" id="oLabor" value="${o.labor}"></div>
+<div><label>Anticipo ($)</label><input type="number" step="0.01" id="oAdvance" value="${o.advance}"></div>
+<div><label>Notas / garantía</label><input id="oNotes" value="${esc(o.notes)}"></div>
+</div>
+<div class="actions"><button class="btn" onclick="saveOrder('${o.id}')">Guardar orden</button><button class="btn green" onclick="saveOrder('${o.id}',false,true)">Guardar y WhatsApp</button><button class="btn blue" onclick="saveOrder('${o.id}',true)">Guardar e imprimir</button><button class="btn secondary" onclick="closeModal()">Cancelar</button>${!isNew?`<button class="btn red" onclick="deleteOrder('${o.id}')">Eliminar</button>`:''}</div>`);
+}
+function orderBikes(){let cid=document.getElementById('oClient').value,b=document.getElementById('oBike');b.innerHTML=db.bikes.filter(x=>x.clientId===cid).map(x=>`<option value="${x.id}">${esc(x.brand)} ${esc(x.model)} · ${esc(x.plates)}</option>`).join('')}
+function saveOrder(id,print=false,whatsapp=false){
+let o=db.orders.find(x=>x.id===id);
+if(!o){o={id, num:db.seq++,date:new Date().toLocaleDateString('es-MX'),photo:''};db.orders.push(o)}
+o.clientId=document.getElementById('oClient').value;o.bikeId=document.getElementById('oBike').value;o.status=document.getElementById('oStatus').value;o.delivery=document.getElementById('oDelivery').value;o.problem=document.getElementById('oProblem').value;o.diagnosis=document.getElementById('oDiagnosis').value;o.work=document.getElementById('oWork').value;o.partsText=document.getElementById('oPartsText').value;o.partsCost=Number(document.getElementById('oParts').value)||0;o.labor=Number(document.getElementById('oLabor').value)||0;o.advance=Number(document.getElementById('oAdvance').value)||0;o.total=o.partsCost+o.labor;o.notes=document.getElementById('oNotes').value;
+let file=document.getElementById('oPhoto')?.files?.[0];
+let finish=()=>{closeModal();save();if(print)printOrder(o.id);if(whatsapp)sendWhatsApp(o.id)};
+if(file){let r=new FileReader();r.onload=()=>{o.photo=r.result;finish()};r.readAsDataURL(file)}else finish();
+}
+function sendWhatsApp(id){
+let o=db.orders.find(x=>x.id===id),c=db.clients.find(x=>x.id===o.clientId),b=db.bikes.find(x=>x.id===o.bikeId);
+if(!c?.phone)return alert('Este cliente no tiene teléfono/WhatsApp registrado.');
+let phone=c.phone.replace(/\D/g,'');if(phone.length===10)phone='52'+phone;
+let msg=`Mecánica de Motos Ugalde\nOrden #${o.num}\nCliente: ${c.name}\nMoto: ${(b?.brand||'')} ${(b?.model||'')}\nEstado: ${o.status}\nTotal: ${money(o.total)}\nAnticipo: ${money(o.advance)}\nSaldo: ${money(o.total-o.advance)}\n\nDiagnóstico: ${o.diagnosis||'Pendiente'}`;
+window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+}
+function printOrder(id){let o=db.orders.find(x=>x.id===id),c=db.clients.find(x=>x.id===o.clientId),b=db.bikes.find(x=>x.id===o.bikeId);let w=window.open('','_blank');w.document.write(`<html><head><title>Orden #${o.num}</title><style>body{font-family:Arial;max-width:760px;margin:30px auto;color:#111}h1{margin-bottom:2px}hr{border:0;border-top:1px solid #999}.box{border:1px solid #bbb;padding:12px;margin:10px 0}table{width:100%;border-collapse:collapse}td{padding:7px;border-bottom:1px solid #ddd}.total{font-size:20px;font-weight:bold;text-align:right}@media print{button{display:none}}</style><style>
+.photo-preview{max-width:140px;max-height:140px;border-radius:12px;object-fit:cover;border:1px solid #cbd5e1;margin-top:8px}
+.statbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.mini{font-size:12px;padding:6px 9px}
+</style></head><body><h1>Mecánica de Motos Ugalde</h1><div>WhatsApp 5619449163 · Fijo 5661291981 · Calle Navidad número 25</div><hr><h2>ORDEN #${o.num}</h2><div class="box"><b>Cliente:</b> ${esc(c?.name)}<br><b>Teléfono:</b> ${esc(c?.phone)}<br><b>Moto:</b> ${esc(b?.brand)} ${esc(b?.model)} ${esc(b?.year)}<br><b>Placas:</b> ${esc(b?.plates)} · <b>Km:</b> ${esc(b?.km)}</div><div class="box"><b>Falla reportada</b><p>${esc(o.problem)}</p><b>Diagnóstico</b><p>${esc(o.diagnosis)}</p><b>Trabajo realizado</b><p>${esc(o.work)}</p><b>Refacciones</b><p>${esc(o.partsText)}</p></div><table><tr><td>Refacciones</td><td>${money(o.partsCost)}</td></tr><tr><td>Mano de obra</td><td>${money(o.labor)}</td></tr><tr><td class="total">TOTAL</td><td class="total">${money(o.total)}</td></tr><tr><td>Anticipo</td><td>${money(o.advance)}</td></tr><tr><td><b>SALDO</b></td><td><b>${money(o.total-o.advance)}</b></td></tr></table><div class="box"><b>Estado:</b> ${esc(o.status)}<br><b>Entrega:</b> ${esc(o.delivery)}<br><b>Notas/Garantía:</b> ${esc(o.notes)}</div><p style="text-align:center">Gracias por su preferencia.</p><script>window.print()<\/script></body></html>`);w.document.close()}
+
+function openPart(id=null){let p=db.parts.find(x=>x.id===id)||{name:'',code:'',stock:0,min:1,buy:0,sell:0};modal(`<h2>${id?'Editar':'Nueva'} refacción</h2><div class="grid"><div><label>Nombre *</label><input id="pName" value="${esc(p.name)}"></div><div><label>Código</label><input id="pCode" value="${esc(p.code)}"></div><div><label>Existencia</label><input type="number" id="pStock" value="${p.stock}"></div><div><label>Stock mínimo</label><input type="number" id="pMin" value="${p.min}"></div><div><label>Precio compra</label><input type="number" step=".01" id="pBuy" value="${p.buy}"></div><div><label>Precio venta</label><input type="number" step=".01" id="pSell" value="${p.sell}"></div></div><div class="actions"><button class="btn" onclick="savePart('${id||''}')">Guardar</button><button class="btn secondary" onclick="closeModal()">Cancelar</button></div>`)}
+function savePart(id){let p={id:id||newId(),name:document.getElementById('pName').value.trim(),code:document.getElementById('pCode').value.trim(),stock:Number(document.getElementById('pStock').value)||0,min:Number(document.getElementById('pMin').value)||0,buy:Number(document.getElementById('pBuy').value)||0,sell:Number(document.getElementById('pSell').value)||0};if(!p.name)return alert('Escribe el nombre.');let i=db.parts.findIndex(x=>x.id===p.id);if(i>=0)db.parts[i]=p;else db.parts.push(p);closeModal();save()}
+function deletePart(id){if(confirm('¿Eliminar refacción?')){db.parts=db.parts.filter(x=>x.id!==id);save()}}
+function renderParts(){let q=(document.getElementById('partSearch')?.value||'').toLowerCase();document.getElementById('partsBody').innerHTML=db.parts.filter(p=>(p.name+' '+p.code).toLowerCase().includes(q)).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.code)}</td><td class="${p.stock<=p.min?'danger':''}">${p.stock}</td><td>${p.min}</td><td>${money(p.buy)}</td><td>${money(p.sell)}</td><td><button class="btn secondary" onclick="openPart('${p.id}')">Editar</button> <button class="btn red" onclick="deletePart('${p.id}')">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="7">No hay refacciones.</td></tr>'}
+
+function openCash(type){modal(`<h2>Registrar ${type==='ingreso'?'ingreso':'gasto'}</h2><div class="grid"><div><label>Concepto *</label><input id="xConcept"></div><div><label>Monto ($) *</label><input type="number" step=".01" id="xAmount"></div></div><div class="actions"><button class="btn ${type==='ingreso'?'green':'red'}" onclick="saveCash('${type}')">Guardar</button><button class="btn secondary" onclick="closeModal()">Cancelar</button></div>`)}
+function saveCash(type){let concept=document.getElementById('xConcept').value.trim(),amount=Number(document.getElementById('xAmount').value)||0;if(!concept||amount<=0)return alert('Completa concepto y monto.');db.cash.push({id:newId(),date:new Date().toLocaleString('es-MX'),type,concept,amount});closeModal();save()}
+function deleteCash(id){if(confirm('¿Eliminar movimiento?')){db.cash=db.cash.filter(x=>x.id!==id);save()}}
+function renderCash(){document.getElementById('cashBody').innerHTML=db.cash.slice().reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${x.type==='ingreso'?'Ingreso':'Gasto'}</td><td>${esc(x.concept)}</td><td>${money(x.amount)}</td><td><button class="btn red" onclick="deleteCash('${x.id}')">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="5">No hay movimientos.</td></tr>'}
+
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo_mecanica_ugalde_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.clients||!x.orders)throw 0;if(confirm('Esto reemplazará los datos actuales. ¿Continuar?')){db=x;save();alert('Respaldo importado.')}}catch{alert('Archivo de respaldo no válido.')}};r.readAsText(f)}
+function clearAll(){if(confirm('ESTO BORRARÁ TODOS LOS CLIENTES, ÓRDENES, INVENTARIO Y CAJA. ¿Continuar?')){localStorage.removeItem(KEY);location.reload()}}
+refresh();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body></html>

@@ -1,0 +1,21 @@
+{
+  "name": "Mecánica de Motos Ugalde PRO",
+  "short_name": "Taller Ugalde",
+  "id": "mecanica-motos-ugalde-pro",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f4f6",
+  "theme_color": "#111827",
+  "description": "Gestión profesional para Mecánica de Motos Ugalde.",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
