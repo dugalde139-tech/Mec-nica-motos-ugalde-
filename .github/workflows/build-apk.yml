@@ -25,7 +25,11 @@ jobs:
 
       - name: Crear plataforma Android
         run: npx cap add android
-
+- name: Verificar archivos web
+  run: |
+    pwd
+    ls -la
+    ls -la www
       - name: Sincronizar Capacitor
         run: npx cap sync android
 
